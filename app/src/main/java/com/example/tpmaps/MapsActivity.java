@@ -9,6 +9,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -18,10 +20,8 @@ import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.TextView;
-import android.content.Context;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,22 +47,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng latLng;
     private TextView battery;
-
-    //Recuperation de la charge de battery
-    private BroadcastReceiver batterylevelReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-           int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-           int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-           float batteryPct = level * 100 / (float)scale;
-
-           battery.setText(String.valueOf(batteryPct)+"%");
-           if (batteryPct == 0){
-               reslong(latLng);
-           }
-        }
-    };
-
 
 
     @Override
@@ -100,39 +84,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         localisations = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //Saint_quentin_piscine = new LatLng(45.1624635, 5.7147129);
-        Saint_quentin_piscine = new LatLng(49.8560988, 3.303515);
-        //Saint_quentin_cinema = new LatLng(50.266667, 1.666667);
-        Saint_quentin_cinema = new LatLng(49.8561059, 3.3035434);
+        Saint_quentin_piscine = new LatLng(45.1624635, 5.7147129);
+        //Saint_quentin_piscine = new LatLng(49.856049899999995, 3.3034059);
+        Saint_quentin_cinema = new LatLng(50.266667, 1.666667);
+        //Saint_quentin_cinema = new LatLng(49.8561059, 3.3035434);
         Saint_quentin_theatre = new LatLng(49.8489, 3.2876);
 
 
-        mMap.addMarker(new MarkerOptions().position(Saint_quentin_piscine).title("Piscine Saint-Quentin"));
+        mMap.addMarker(new MarkerOptions().position(Saint_quentin_piscine).title("Piscine"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Saint_quentin_piscine));
 
-        mMap.addMarker(new MarkerOptions().position(Saint_quentin_cinema).title("Cinema de Saint-Quentin"));
+        mMap.addMarker(new MarkerOptions().position(Saint_quentin_cinema).title("Cinema"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Saint_quentin_cinema));
 
-        mMap.addMarker(new MarkerOptions().position(Saint_quentin_theatre).title("Theatre de Saint-Quentin"));
+        mMap.addMarker(new MarkerOptions().position(Saint_quentin_theatre).title("Theatre"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Saint_quentin_theatre));
 
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.US);
+        String localizedDate = df.format(date);
+        System.out.println(localizedDate);
 
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
+
+                openActivity();
+
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    Date date = new Date(location.getTime());
-                    Log.d("GPS", sdf.format(date));
+                    //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    //Date date = new Date(location.getTime());
+                    //Log.d("GPS", sdf.format(date));
                     latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (test(location.getLatitude(), location.getLongitude(), Saint_quentin_piscine.latitude, Saint_quentin_piscine.longitude)<= 50){
-
+                    //System.out.println(Dist(location.getLatitude(), location.getLongitude(), Saint_quentin_piscine.latitude, Saint_quentin_piscine.longitude));
+                    if (Dist(location.getLatitude(), location.getLongitude(), Saint_quentin_piscine.latitude, Saint_quentin_piscine.longitude)<= 50){
+                        reslong(latLng);
+                    }else if(Dist(location.getLatitude(), location.getLongitude(), Saint_quentin_cinema.latitude, Saint_quentin_cinema.longitude)<= 0.1){
                         reslong(latLng);
 
-                    }else if(test(location.getLatitude(), location.getLongitude(), Saint_quentin_cinema.latitude, Saint_quentin_cinema.longitude)<= 50){
-                        reslong(latLng);
-
-                    }else if (test(location.getLatitude(), location.getLongitude(), Saint_quentin_theatre.latitude, Saint_quentin_theatre.longitude)<= 50){
+                    }else if (Dist(location.getLatitude(), location.getLongitude(), Saint_quentin_theatre.latitude, Saint_quentin_theatre.longitude)<= 50){
                         reslong(latLng);
                     }
 
@@ -177,25 +167,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String myLatitude = String.valueOf(latLng.latitude);
         String myLongitude = String.valueOf(latLng.longitude);
 
-        String message = "Votre position est Latitude = " + myLatitude + "Longitude = " + myLongitude;
+        String message = "Votre enfant est bien arrivé à l'endroit qu'il partait des coordonnées : Latitude = " + myLatitude + "Longitude = " + myLongitude + getTitle();
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
-    public Float test(Double lat1, Double lon1, Double lat2, Double lon2) {
-        double earthRadius = 6371;
-        double latDiff = Math.toRadians(lat2-lat1);
-        double lngDiff = Math.toRadians(lon2-lon1);
-        double a = Math.sin(latDiff /2) * Math.sin(latDiff /2) +
-                Math.cos(Math.toRadians(lat1))*
-                        Math.cos(Math.toRadians(lat2))* Math.sin(lngDiff /2) *
-                        Math.sin(lngDiff /2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = earthRadius * c;
+    private double Dist(double lat1, double lon1, double lat2, double lon2)
+    {
+        int R = 6373; // radius of the earth in kilometres
+        double lat1rad = Math.toRadians(lat1);
+        double lat2rad = Math.toRadians(lat2);
+        double deltaLat = Math.toRadians(lat2-lat1);
+        double deltaLon = Math.toRadians(lon2-lon1);
 
-        int meterConversion = 1609;
+        double a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+                Math.cos(lat1rad) * Math.cos(lat2rad) *
+                        Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
-        return new Float(distance * meterConversion).floatValue();
+        double d = R * c;
+        return d;
+    }
+
+
+    //Recuperation de la charge de battery
+    private BroadcastReceiver batterylevelReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            float batteryPct = level * 100 / (float)scale;
+
+            battery.setText(String.valueOf(batteryPct)+"%");
+
+
+            if (batteryPct == 15){
+                String message = "Le téléphone de votre enfant est déchargé";
+                SmsManager smsManager = SmsManager.getDefault();
+                String phoneNumber = "0754412338";
+                smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+            }else {
+
+                String message = "Votre fils vient de desactiver son téléphone";
+                String phoneNumber = "0754412338";
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+            }
+        }
+    };
+
+    public void openActivity(){
+        Intent intent = new Intent (getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+
+//        Intent intent = new Intent(MapsActivity.this, MainActivity.class);
+//        startActivity(intent);
     }
 
 }

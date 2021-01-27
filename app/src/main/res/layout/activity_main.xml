@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/app_slogan"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="80dp"
+        android:layout_marginTop="5dp"
+        android:text="Bienvenu à la page de config de Tracker of child."
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textSize="22sp"
+        android:textStyle="bold|italic"
+        />
+
+    <EditText
+        android:id="@+id/numphone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="10dp"
+        android:padding="20dp"
+        android:hint="Numero de phone .."
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_below="@+id/app_slogan"
+        android:background="@drawable/input_design"
+        />
+
+    <EditText
+        android:id="@+id/adresse1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Veuillez entrez l'adresse 1"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="10dp"
+        android:padding="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/input_design"
+        android:layout_below="@+id/numphone"
+        />
+    <EditText
+        android:id="@+id/adresse2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Veuillez entrez l'adresse 2"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="10dp"
+        android:padding="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/input_design"
+        android:layout_below="@+id/adresse1"
+        />
+
+    <EditText
+        android:id="@+id/adresse3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Veuillez entrez l'adresse 3"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="10dp"
+        android:padding="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/input_design"
+        android:layout_below="@+id/adresse2"
+        />
+
+    <Button
+        android:id="@+id/btnsignin1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enregistrer"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:padding="17sp"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:background="@drawable/buttons"
+        android:layout_below="@+id/adresse3" />
+
+
+</RelativeLayout>
